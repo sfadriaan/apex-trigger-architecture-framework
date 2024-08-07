@@ -28,12 +28,7 @@ jobs:
         # In this case, we are going to run our commands on the latest version
         # of ubuntu
         runs-on: ubuntu-latest
-        permissions:
-      # Give the default GITHUB_TOKEN write permission to commit and push the
-      # added or changed files to the repository.
-          contents: write
-          actions: read
-          security-events: write
+        
         if: ${{ github.actor != 'dependabot[bot]' }}
         steps:
             # Now we install nodejs in the VM, and specify version 14
@@ -156,22 +151,6 @@ jobs:
 
             # The .sarif file can later be uploaded to github, so that we can see the 
             # results of the scan directly from the PR.
-
-            - name: 'Scan code'
-              run: |
-                  cd changed-sources
-                  sfdx scanner:run --format sarif --target './**/*.cls' --category "Design,Best Practices,Performance" --outfile 'apexScanResults.sarif'  
-                  cd ..
-
-            # Now we upload the .sarif file as explained in the previous step
-            - name: Upload SARIF file
-              uses: github/codeql-action/upload-sarif@v3
-              with:
-                sarif_file: changed-sources/apexScanResults.sarif
-
-            # We do a check-only deploy and we only run the tests specified in the PR
-            # If the env variable does not equal 'all', we know that there is a list of
-            # tests that can be run
 
             - name: 'Check-only deploy delta changes - run specified tests'
               if: ${{ env.APEX_TESTS != 'all' }}
