@@ -128,13 +128,14 @@ jobs:
             # The URL is stored in the Github Secret named SFDX_INTEGRATION_URL
             # so here we store the URL into a text file
             - name: 'Populate auth file with SFDX_URL secret of integration org'
-              shell: bash
+              env:
+                SFDX_URL: ${{ secrets.SFDX_INTEGRATION_URL }}
               run: |
-                  echo ${{ secrets.SFDX_INTEGRATION_URL}} > SFDX_INTEGRATION_URL.txt
+                  echo "$SFDX_URL" > SFDX_INTEGRATION_URL.txt
 
             # Authenticate to org using the URL stored in the text file
             - name: 'Authenticate to Integration Org'
-              run: sfdx auth:sfdxurl:store -f ./SFDX_INTEGRATION_URL.txt -s -a integration
+              run: sf org login sfdx-url -f ./SFDX_INTEGRATION_URL.txt -s -a integration
 
             # We use SFDX Git Delta to create a directory with only the metadata that has changed.
             # this allows us to deploy only those changes, as opposed to deploying the entire branch. 
